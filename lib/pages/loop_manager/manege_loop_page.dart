@@ -1,13 +1,14 @@
+import 'package:dolab/models/loop_model.dart';
 import 'package:flutter/material.dart';
 
-import 'Task.dart';
 
-class EditTasksPage extends StatefulWidget {
-  final List<Task> tasks;
-  final Function(int oldPos, int newPos) onReorder;
-  final Function(int pos) deleteTask;
+class ManageTasksPage extends StatefulWidget {
+  // final List<Task> tasks;
+  // final Function(int oldPos, int newPos) onReorder;
+  // final Function(int pos) deleteTask;
+  final LoopModel model;
 
-  EditTasksPage(this.tasks, this.onReorder, this.deleteTask);
+  ManageTasksPage(this.model);
 
   @override
   _EditTasksState createState() {
@@ -15,8 +16,9 @@ class EditTasksPage extends StatefulWidget {
   }
 }
 
-class _EditTasksState extends State<EditTasksPage> {
-  showDeleteDialog(BuildContext context, {@required taskIndex}) {
+class _EditTasksState extends State<ManageTasksPage> {
+  showDeleteDialog(BuildContext context, LoopModel model,
+      {@required taskIndex}) {
     // set up the buttons
     Widget cancelButton = FlatButton(
       child: Text("Cancel"),
@@ -28,7 +30,7 @@ class _EditTasksState extends State<EditTasksPage> {
       child: Text("Delete"),
       onPressed: () {
         setState(() {
-          widget.deleteTask(taskIndex);
+          model.deleteTask(taskIndex);
           Navigator.of(context).pop();
         });
       },
@@ -36,7 +38,7 @@ class _EditTasksState extends State<EditTasksPage> {
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: Text("Delete Task:"),
-      content: Text(widget.tasks[taskIndex].name),
+      content: Text(model.tasks[taskIndex].name),
       actions: [
         deleteButton,
         cancelButton,
@@ -60,20 +62,20 @@ class _EditTasksState extends State<EditTasksPage> {
       body: Container(
         child: ReorderableListView(
           children: [
-            for (int i = 0; i < widget.tasks.length; i++)
+            for (int i = 0; i < widget.model.tasks.length; i++)
               Container(
-                key: ValueKey(widget.tasks[i]),
+                key: ValueKey(widget.model.tasks[i]),
                 margin: EdgeInsets.all(2),
                 child: Card(
                   child: ListTile(
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () {
-                        showDeleteDialog(context, taskIndex: i);
+                        showDeleteDialog(context, widget.model, taskIndex: i);
                       },
                     ),
                     leading: Icon(Icons.drag_indicator),
-                    title: Text(widget.tasks[i].name),
+                    title: Text(widget.model.tasks[i].name),
                     onTap: () {},
                   ),
                 ),
@@ -81,9 +83,9 @@ class _EditTasksState extends State<EditTasksPage> {
           ],
           onReorder: (oldP, newP) {
             // dev.log("old:"+oldP.toString()+ " new:"+newP.toString());
-            // setState(() {
-              widget.onReorder(oldP, newP);
-            // });
+            setState(() {
+              widget.model.reorderTasks(oldP, newP);
+            });
           },
         ),
       ),
