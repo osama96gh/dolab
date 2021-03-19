@@ -1,6 +1,6 @@
 
 
-import 'package:dolab/models/loop_model.dart';
+import 'package:dolab/models/tasks_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +24,7 @@ class _TasksListWidgetState extends State<TasksListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    LoopModel model = Provider.of<LoopModel>(context);
+    TasksModel model = Provider.of<TasksModel>(context);
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       _controller.animateTo(model.index * MediaQuery.of(context).size.width,
           duration: Duration(milliseconds: 500), curve: Curves.linear);

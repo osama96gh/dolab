@@ -1,21 +1,22 @@
 import 'dart:convert';
 
- import 'package:dolab/models/task.dart';
+import 'package:dolab/models/task.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LoopModel with ChangeNotifier {
-  var index = 0;
-
-  final taskKey = "tasks_key";
+class TasksModel with ChangeNotifier {
+  var tasksKey = "tasks_key";
   final indexKey = "index_key";
 
+  TasksModel(this.tasksKey);
+
+  var index = 0;
   List<Task> tasks = List<Task>.empty(growable: true);
 
   readTasksAndIndex() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    var jsonData = prefs.getString(taskKey) ?? "[]";
+    var jsonData = prefs.getString(tasksKey) ?? "[]";
     _tasksFromJson(jsonData);
     index = prefs.getInt(indexKey) ?? 0;
     notifyListeners();
@@ -46,7 +47,7 @@ class LoopModel with ChangeNotifier {
 
   storeTasks() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(taskKey, _tasksToJson());
+    prefs.setString(tasksKey, _tasksToJson());
   }
 
   reorderTasks(oldPos, newPos) {

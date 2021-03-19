@@ -1,15 +1,15 @@
-import 'package:dolab/models/loop_model.dart';
 import 'package:dolab/models/task.dart';
-import 'package:dolab/pages/loop_manager/manege_loop_page.dart';
+import 'package:dolab/models/tasks_model.dart';
+import 'package:dolab/pages/manage_tasks_page/manage_tasks_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'loop_home.dart';
+import 'display_tasks_page.dart';
 
 class ButtonsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    LoopModel model = Provider.of<LoopModel>(context);
+    TasksModel model = Provider.of<TasksModel>(context);
 
     return Container(
         constraints: BoxConstraints(maxWidth: 100),
@@ -55,7 +55,7 @@ class ButtonsWidget extends StatelessWidget {
                 var bottomSheetController = showBottomSheet(
                     context: context,
                     builder: (context) => BottomSheetWidget((taskName) {
-                          model.addTask(new Task(taskName));
+                          model.addTask(Task(taskName));
                         }));
                 bottomSheetController.closed.then((value) {});
               },

@@ -1,8 +1,6 @@
- import 'package:dolab/pages/loop_home/loop_home.dart';
+import 'package:dolab/pages/display_tasks_page/display_tasks_page.dart';
+import 'package:dolab/pages/disply_loops_page/display_loops_page.dart';
 import 'package:flutter/material.dart';
-
-
-
 
 void main() {
   runApp(MyApp());
@@ -19,9 +17,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: DisplayTasksPage(title: 'DoLab'),
+      routes: {
+        "/": (_) => loopsPage(),
+        "/tasks": (_) => DisplayTasksPage(title: 'DoLab'),
+      },
     );
   }
 }
-
-

@@ -1,4 +1,4 @@
-import 'package:dolab/models/loop_model.dart';
+import 'package:dolab/models/tasks_model.dart';
 import 'package:flutter/material.dart';
 
 
@@ -6,7 +6,7 @@ class ManageTasksPage extends StatefulWidget {
   // final List<Task> tasks;
   // final Function(int oldPos, int newPos) onReorder;
   // final Function(int pos) deleteTask;
-  final LoopModel model;
+  final TasksModel model;
 
   ManageTasksPage(this.model);
 
@@ -17,7 +17,7 @@ class ManageTasksPage extends StatefulWidget {
 }
 
 class _EditTasksState extends State<ManageTasksPage> {
-  showDeleteDialog(BuildContext context, LoopModel model,
+  showDeleteDialog(BuildContext context, TasksModel model,
       {@required taskIndex}) {
     // set up the buttons
     Widget cancelButton = FlatButton(

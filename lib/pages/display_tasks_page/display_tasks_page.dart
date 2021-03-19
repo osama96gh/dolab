@@ -1,5 +1,5 @@
-import 'package:dolab/models/loop_model.dart';
-import 'package:dolab/pages/loop_home/task_list.dart';
+import 'package:dolab/models/tasks_model.dart';
+import 'package:dolab/pages/display_tasks_page/task_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,12 +20,13 @@ class DisplayTasksPage extends StatefulWidget {
 class _DisplayTasksPageState extends State<DisplayTasksPage> {
   @override
   void initState() {
-   }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => LoopModel()..readTasksAndIndex(),
+      create: (_) => TasksModel(widget.title)..readTasksAndIndex(),
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
@@ -61,7 +62,7 @@ class _DisplayTasksPageState extends State<DisplayTasksPage> {
                   child: Padding(
                     padding: EdgeInsets.only(
                         right: 50, left: 50, top: 20, bottom: 20),
-                    child: Consumer<LoopModel>(
+                    child: Consumer<TasksModel>(
                       builder: (context, model, _) => ButtonsWidget(),
                     ),
                   ),
