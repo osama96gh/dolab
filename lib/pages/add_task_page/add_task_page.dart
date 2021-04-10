@@ -1,13 +1,14 @@
 import 'package:dolab/models/loop.dart';
+import 'package:dolab/models/task.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class AddLoopPage extends StatefulWidget {
+class AddTaskPage extends StatefulWidget {
   @override
-  _AddLoopPageState createState() => _AddLoopPageState();
+  _AddTaskPageState createState() => _AddTaskPageState();
 }
 
-class _AddLoopPageState extends State<AddLoopPage> {
+class _AddTaskPageState extends State<AddTaskPage> {
   var enteredText = '';
 
   @override
@@ -15,7 +16,7 @@ class _AddLoopPageState extends State<AddLoopPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add New Loop'),
+        title: Text('Add New Task'),
       ),
       body: Center(
         child: Padding(
@@ -29,14 +30,14 @@ class _AddLoopPageState extends State<AddLoopPage> {
                   });
                 },
                 decoration: InputDecoration(
-                    icon: Icon(Icons.title), hintText: 'Loop Name'),
+                    icon: Icon(Icons.title), hintText: 'Task Name'),
               ),
               ElevatedButton(
                 onPressed: enteredText.isEmpty
                     ? null
                     : () {
-                        Navigator.pop(context, Loop(enteredText));
-                      },
+                  Navigator.pop(context, Task(enteredText));
+                },
                 child: Text('Done'),
               ),
             ],
