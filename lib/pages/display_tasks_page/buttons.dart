@@ -1,10 +1,9 @@
 import 'package:dolab/models/task.dart';
 import 'package:dolab/models/tasks_model.dart';
+import 'package:dolab/pages/add_task_page/add_task_page.dart';
 import 'package:dolab/pages/manage_tasks_page/manage_tasks_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'display_tasks_page.dart';
 
 class ButtonsWidget extends StatelessWidget {
   @override
@@ -51,13 +50,10 @@ class ButtonsWidget extends StatelessWidget {
               ],
             ),
             OutlineButton.icon(
-              onPressed: () {
-                var bottomSheetController = showBottomSheet(
-                    context: context,
-                    builder: (context) => BottomSheetWidget((taskName) {
-                          model.addTask(Task(taskName));
-                        }));
-                bottomSheetController.closed.then((value) {});
+              onPressed: () async {
+                Task loop = await Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => AddTaskPage()));
+                if (loop != null) model.addTask(loop);
               },
               icon: Icon(Icons.add),
               label: Text("Add New Task"),
