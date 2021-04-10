@@ -45,9 +45,9 @@ class loopsPage extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => DisplayTasksPage(
-                                    title: model.loops[idx].name)));
+                                    title: model.loops[idx].title)));
                       },
-                      title: Text(model.loops[idx].name),
+                      title: Text(model.loops[idx].title),
                     ),
                   ),
                 );
