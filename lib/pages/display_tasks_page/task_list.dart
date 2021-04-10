@@ -48,7 +48,7 @@ class _TasksListWidgetState extends State<TasksListWidget> {
                     Align(
                       alignment: Alignment.center,
                       child: Text(
-                        model.tasks[i].name,
+                        model.tasks[i].title,
                         style: TextStyle(
                           color: isCurrent ? Colors.white : Colors.blueGrey,
                           fontSize: 26,
@@ -68,7 +68,7 @@ class _TasksListWidgetState extends State<TasksListWidget> {
                                 bottomLeft: Radius.circular(8))),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(model.tasks[i].checkedTime.toString()),
+                          child: Text(model.tasks[i].checkedTimes.toString()),
                         ),
                       ),
                     ),

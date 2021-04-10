@@ -1,3 +1,4 @@
+import 'package:dolab/models/loop.dart';
 import 'package:dolab/models/tasks_model.dart';
 import 'package:dolab/pages/display_tasks_page/task_list.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,9 +8,9 @@ import 'package:provider/provider.dart';
 import 'buttons.dart';
 
 class DisplayTasksPage extends StatefulWidget {
-  DisplayTasksPage({Key key, this.title}) : super(key: key);
+  DisplayTasksPage({Key key, this.parentLoop}) : super(key: key);
 
-  final String title;
+  final Loop parentLoop;
 
   @override
   _DisplayTasksPageState createState() {
@@ -26,10 +27,10 @@ class _DisplayTasksPageState extends State<DisplayTasksPage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => TasksModel(widget.title)..readTasksAndIndex(),
+      create: (_) => TasksModel(widget.parentLoop)..readTasksAndIndex(),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Text(widget.parentLoop.name),
           centerTitle: true,
         ),
         body: Center(

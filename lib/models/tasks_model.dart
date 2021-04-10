@@ -1,42 +1,53 @@
 import 'dart:convert';
 
+import 'package:dolab/database/task_provider.dart';
+import 'package:dolab/models/loop.dart';
 import 'package:dolab/models/task.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TasksModel with ChangeNotifier {
-  var tasksKey = "tasks_key";
+  Loop parentLoop;
+
   final indexKey = "index_key";
 
-  TasksModel(this.tasksKey);
+  TasksModel(this.parentLoop);
 
   var index = 0;
   List<Task> tasks = List<Task>.empty(growable: true);
 
-  readTasksAndIndex() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  TaskProvider provider;
 
-    var jsonData = prefs.getString(tasksKey) ?? "[]";
-    _tasksFromJson(jsonData);
-    index = prefs.getInt(indexKey) ?? 0;
+  readTasksAndIndex() async {
+    provider = new TaskProvider();
+    await provider.open();
+
+    tasks.addAll(await provider.getTasksForSpeceficLoop(parentLoop.id));
     notifyListeners();
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    //
+    // var jsonData = prefs.getString(tasksKey) ?? "[]";
+    // _tasksFromJson(jsonData);
+    // index = prefs.getInt(indexKey) ?? 0;
+    // notifyListeners();
   }
 
   _tasksFromJson(String jsonData) {
     tasks.clear();
     List<dynamic> list = json.decode(jsonData);
     for (dynamic d in list) {
-      tasks.add(Task.fromJson(d));
+      tasks.add(Task.fromMap(d));
     }
   }
 
   _tasksToJson() {
-    return jsonEncode(tasks.map((e) => e.toJson()).toList());
+    return jsonEncode(tasks.map((e) => e.toMap()).toList());
   }
 
-  addTask(Task t) {
+  addTask(Task t) async {
+    t= await provider.insert(t, parentLoop.id);
     tasks.add(t);
-    storeTasks();
+    // storeTasks();
     notifyListeners();
   }
 
@@ -45,10 +56,10 @@ class TasksModel with ChangeNotifier {
     prefs.setInt(indexKey, index);
   }
 
-  storeTasks() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(tasksKey, _tasksToJson());
-  }
+  // storeTasks() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   prefs.setString(loopId, _tasksToJson());
+  // }
 
   reorderTasks(oldPos, newPos) {
     var task = tasks.removeAt(oldPos);
@@ -57,7 +68,7 @@ class TasksModel with ChangeNotifier {
     else
       tasks.insert(newPos, task);
     notifyListeners();
-    storeTasks();
+    // storeTasks();
   }
 
   deleteTask(int pos) {
@@ -65,15 +76,16 @@ class TasksModel with ChangeNotifier {
     tasks.length == 0 ? index = 0 : index = index % tasks.length;
 
     storeIndex();
-    storeTasks();
+    // storeTasks();
   }
 
   checkCurrentTask() {
-    tasks[index].checkedTime++;
+    tasks[index].checkedTimes++;
+    provider.update(tasks[index]);
     index = (++index) % tasks.length;
     notifyListeners();
     storeIndex();
-    storeTasks();
+    // storeTasks();
   }
 
   skipCurrentTask() {

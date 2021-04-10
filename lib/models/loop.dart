@@ -1,5 +1,6 @@
 class Loop {
   String name;
+  int id = 0;
 
   Loop(this.name);
 
