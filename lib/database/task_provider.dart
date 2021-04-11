@@ -6,21 +6,32 @@ import 'package:sqflite/sqflite.dart';
 class TaskProvider {
   Database db;
 
-  Future open({String name = databaseName, version = databaseVersion}) async {
-    String path =  join(await getDatabasesPath(), name);
-    db = await openDatabase(path, version: version,
-        onCreate: (Database db, int version) async {
-      await db.execute(
-        '''
+  _onCreateDatabase(Database db, int version) async {
+    await db.execute(
+      '''
          create table ${TodoTableInfo.tableName} ( 
           ${TodoTableInfo.columnId} integer primary key autoincrement, 
           ${TodoTableInfo.columnParentLoopId} integer not null,
+          ${TodoTableInfo.columnPosition} integer not null,
           ${TodoTableInfo.columnTitle} text not null,
           ${TodoTableInfo.columnCheckedTimes} integer
           )
         ''',
-      );
-    });
+    );
+  }
+
+  _onUpgradeDatabase(Database db, int oldVersion, int newVersion) async {
+    _onCreateDatabase(db, newVersion);
+  }
+
+  Future open({String name = databaseName, version = databaseVersion}) async {
+    String path = join(await getDatabasesPath(), name);
+    db = await openDatabase(
+      path,
+      version: version,
+      onCreate: _onCreateDatabase,
+      onUpgrade: _onUpgradeDatabase,
+    );
   }
 
   Future<Task> insert(Task todo, int parentLoopId) async {
@@ -31,26 +42,61 @@ class TaskProvider {
     return todo;
   }
 
-  Future<List<Task>> getTasksForSpeceficLoop(int loopId) async {
+  Future<List<Task>> getTasksForSpecificLoop(int loopId) async {
     List<Map> maps = await db.query(TodoTableInfo.tableName,
         columns: [
           TodoTableInfo.columnId,
           TodoTableInfo.columnParentLoopId,
+          TodoTableInfo.columnPosition,
           TodoTableInfo.columnTitle,
           TodoTableInfo.columnCheckedTimes
         ],
+        orderBy: '''${TodoTableInfo.columnPosition} ASC''',
         where: '''${TodoTableInfo.columnParentLoopId} = ?''',
-        whereArgs: [loopId]);
+        whereArgs: [
+          loopId
+        ]);
 
     List<Task> tasks = [];
     maps.forEach((element) {
+      print(element);
       tasks.add(Task.fromMap(element));
     });
     return tasks;
   }
 
-  Future<int> delete(int id) async {
-    return await db.delete(TodoTableInfo.tableName, where: '${TodoTableInfo.columnId} = ?', whereArgs: [id]);
+  Future rearang(Task t, bool isDown, oldP, newP) {
+    if (isDown) {
+      return db.transaction((txn) async {
+        await txn.rawUpdate(
+            '''UPDATE ${TodoTableInfo.tableName} SET ${TodoTableInfo.columnPosition} = ${TodoTableInfo.columnPosition} -1 WHERE ${TodoTableInfo.columnPosition} > ? and ${TodoTableInfo.columnPosition} <= ?''',
+            [oldP, newP]);
+
+        await txn.rawUpdate(
+            '''UPDATE ${TodoTableInfo.tableName} SET ${TodoTableInfo.columnPosition} = ${newP}  WHERE ${TodoTableInfo.columnId} = ? ''',
+            [t.id]);
+      });
+    } else {
+      return db.transaction((txn) async {
+        await txn.rawUpdate(
+            '''UPDATE ${TodoTableInfo.tableName} SET ${TodoTableInfo.columnPosition} = ${TodoTableInfo.columnPosition} +1 WHERE ${TodoTableInfo.columnPosition} < ? and ${TodoTableInfo.columnPosition} >= ?''',
+            [oldP, newP]);
+
+        await txn.rawUpdate(
+            '''UPDATE ${TodoTableInfo.tableName} SET ${TodoTableInfo.columnPosition} = ${newP}  WHERE ${TodoTableInfo.columnId} = ? ''',
+            [t.id]);
+      });
+    }
+  }
+
+  Future delete(Task k) async {
+    return db.transaction((txn) async {
+      await txn.rawUpdate(
+          '''UPDATE ${TodoTableInfo.tableName} SET ${TodoTableInfo.columnPosition} = ${TodoTableInfo.columnPosition} -1 WHERE ${TodoTableInfo.columnPosition} > ?''',
+          [k.position]);
+      await txn.delete(TodoTableInfo.tableName,
+          where: '''${TodoTableInfo.columnId} = ?''', whereArgs: [k.id]);
+    });
   }
 
   Future<int> update(Task todo) async {

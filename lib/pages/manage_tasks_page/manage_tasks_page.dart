@@ -75,7 +75,7 @@ class _EditTasksState extends State<ManageTasksPage> {
                       },
                     ),
                     leading: Icon(Icons.drag_indicator),
-                    title: Text(widget.model.tasks[i].title),
+                    title: Text(widget.model.tasks[i].title +" "+ widget.model.tasks[i].position.toString()),
                     onTap: () {},
                   ),
                 ),

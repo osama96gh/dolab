@@ -26,14 +26,14 @@ class _TasksListWidgetState extends State<TasksListWidget> {
   Widget build(BuildContext context) {
     TasksModel model = Provider.of<TasksModel>(context);
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      _controller.animateTo(model.index * MediaQuery.of(context).size.width,
+      _controller.animateTo(model.getIndex() * MediaQuery.of(context).size.width,
           duration: Duration(milliseconds: 500), curve: Curves.linear);
     });
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       controller: _controller,
       itemBuilder: (context, i) {
-        bool isCurrent = i == model.index;
+        bool isCurrent = i == model.getIndex();
         return Container(
             width: MediaQuery.of(context).size.width,
             child: Padding(

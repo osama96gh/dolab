@@ -27,7 +27,7 @@ class _DisplayTasksPageState extends State<DisplayTasksPage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => TasksModel(widget.parentLoop)..readTasksAndIndex(),
+      create: (_) => TasksModel(widget.parentLoop)..readTasks(),
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.parentLoop.name),

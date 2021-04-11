@@ -4,12 +4,14 @@ class Task {
   String title;
   int checkedTimes = 0;
   int id;
+  int position;
 
-  Task(this.title, [this.id, this.checkedTimes = 0]);
+  Task(this.title, this.position, [this.id, this.checkedTimes = 0]);
 
-  Task.fromMap(Map<String, dynamic> json)
-      : title = json[TodoTableInfo.columnTitle],
-        checkedTimes = json[TodoTableInfo.columnCheckedTimes] {
+  Task.fromMap(Map<String, dynamic> json) {
+    title = json[TodoTableInfo.columnTitle];
+    checkedTimes = json[TodoTableInfo.columnCheckedTimes];
+    position = json[TodoTableInfo.columnPosition];
     int id = json[TodoTableInfo.columnId];
     if (id != null) {
       this.id = id;
@@ -19,6 +21,7 @@ class Task {
   Map<String, dynamic> toMap() => {
         TodoTableInfo.columnTitle: title,
         TodoTableInfo.columnCheckedTimes: checkedTimes,
-        TodoTableInfo.columnId: id
+        TodoTableInfo.columnId: id,
+        TodoTableInfo.columnPosition: position
       };
 }

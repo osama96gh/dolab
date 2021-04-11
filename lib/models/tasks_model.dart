@@ -1,96 +1,77 @@
-import 'dart:convert';
-
 import 'package:dolab/database/task_provider.dart';
 import 'package:dolab/models/loop.dart';
 import 'package:dolab/models/task.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class TasksModel with ChangeNotifier {
   Loop parentLoop;
 
-  final indexKey = "index_key";
-
   TasksModel(this.parentLoop);
 
-  var index = 0;
   List<Task> tasks = List<Task>.empty(growable: true);
 
   TaskProvider provider;
 
-  readTasksAndIndex() async {
+  //TODO: use loop provider to store the changes could happen to the index in the parent loop object
+
+  readTasks() async {
     provider = new TaskProvider();
     await provider.open();
 
-    tasks.addAll(await provider.getTasksForSpeceficLoop(parentLoop.id));
+    tasks.addAll(await provider.getTasksForSpecificLoop(parentLoop.id));
     notifyListeners();
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    //
-    // var jsonData = prefs.getString(tasksKey) ?? "[]";
-    // _tasksFromJson(jsonData);
-    // index = prefs.getInt(indexKey) ?? 0;
-    // notifyListeners();
-  }
-
-  _tasksFromJson(String jsonData) {
-    tasks.clear();
-    List<dynamic> list = json.decode(jsonData);
-    for (dynamic d in list) {
-      tasks.add(Task.fromMap(d));
-    }
-  }
-
-  _tasksToJson() {
-    return jsonEncode(tasks.map((e) => e.toMap()).toList());
   }
 
   addTask(Task t) async {
-    t= await provider.insert(t, parentLoop.id);
+    t = await provider.insert(t, parentLoop.id);
     tasks.add(t);
-    // storeTasks();
     notifyListeners();
   }
 
-  storeIndex() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt(indexKey, index);
-  }
+  //TODO: fix the reorder function the mach the new changes
+  reorderTasks(oldPos, newPos)async {
+    var isMoveDown = newPos > oldPos;
+    if (isMoveDown) newPos--;
+    print('old ' + oldPos.toString() + " new: " + newPos.toString());
 
-  // storeTasks() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   prefs.setString(loopId, _tasksToJson());
-  // }
-
-  reorderTasks(oldPos, newPos) {
     var task = tasks.removeAt(oldPos);
-    if (newPos >= tasks.length)
-      tasks.add(task);
-    else
-      tasks.insert(newPos, task);
+    tasks.insert(newPos, task);
     notifyListeners();
-    // storeTasks();
+    await provider.rearang(task,isMoveDown,oldPos,newPos);
   }
 
-  deleteTask(int pos) {
-    tasks.removeAt(pos);
-    tasks.length == 0 ? index = 0 : index = index % tasks.length;
-
+  //TODO: fix delete task  function
+  deleteTask(int pos) async {
+    Task toDelete = tasks.removeAt(pos);
+    tasks.length == 0
+        ? parentLoop.index = 0
+        : parentLoop.index = parentLoop.index % tasks.length;
     storeIndex();
-    // storeTasks();
+    notifyListeners();
+
+    await provider.delete(toDelete);
   }
 
   checkCurrentTask() {
-    tasks[index].checkedTimes++;
-    provider.update(tasks[index]);
-    index = (++index) % tasks.length;
-    notifyListeners();
+    tasks[parentLoop.index].checkedTimes++;
+    provider.update(tasks[parentLoop.index]);
+    parentLoop.index = (++parentLoop.index) % tasks.length;
     storeIndex();
-    // storeTasks();
+    notifyListeners();
   }
 
   skipCurrentTask() {
-    index = (++index) % tasks.length;
-    notifyListeners();
+    parentLoop.index =
+        tasks.length == 0 ? 0 : (++parentLoop.index) % tasks.length;
     storeIndex();
+    notifyListeners();
+  }
+
+  void storeIndex() {
+    //TODO: implement this function
+  }
+
+  int getIndex() {
+    return parentLoop.index;
   }
 }
