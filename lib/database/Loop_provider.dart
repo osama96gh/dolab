@@ -48,9 +48,9 @@ class LoopProvider {
     return await db.delete(LoopTableInfo.tableName, where: '''${LoopTableInfo.columnId} = ?''', whereArgs: [id]);
   }
 
-  Future<int> update(Loop todo) async {
-    return await db.update(LoopTableInfo.tableName, todo.toMap(),
-        where: '''${LoopTableInfo.columnId} = ?''', whereArgs: [todo.id]);
+  Future<int> update(Loop loop) async {
+    return await db.update(LoopTableInfo.tableName, loop.toMap(),
+        where: '''${LoopTableInfo.columnId} = ?''', whereArgs: [loop.id]);
   }
 
   Future close() async => db.close();

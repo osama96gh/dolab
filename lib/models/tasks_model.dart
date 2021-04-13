@@ -1,3 +1,4 @@
+import 'package:dolab/database/Loop_provider.dart';
 import 'package:dolab/database/task_provider.dart';
 import 'package:dolab/models/loop.dart';
 import 'package:dolab/models/task.dart';
@@ -10,20 +11,24 @@ class TasksModel with ChangeNotifier {
 
   List<Task> tasks = List<Task>.empty(growable: true);
 
-  TaskProvider provider;
+  TaskProvider taskProvider;
+  LoopProvider loopProvider;
 
   //TODO: use loop provider to store the changes could happen to the index in the parent loop object
 
   readTasks() async {
-    provider = new TaskProvider();
-    await provider.open();
+    taskProvider = new TaskProvider();
+    await taskProvider.open();
 
-    tasks.addAll(await provider.getTasksForSpecificLoop(parentLoop.id));
+    loopProvider = new LoopProvider();
+    await loopProvider.open();
+
+    tasks.addAll(await taskProvider.getTasksForSpecificLoop(parentLoop.id));
     notifyListeners();
   }
 
   addTask(Task t) async {
-    t = await provider.insert(t, parentLoop.id);
+    t = await taskProvider.insert(t, parentLoop.id);
     tasks.add(t);
     notifyListeners();
   }
@@ -37,7 +42,7 @@ class TasksModel with ChangeNotifier {
     var task = tasks.removeAt(oldPos);
     tasks.insert(newPos, task);
     notifyListeners();
-    await provider.rearang(task,isMoveDown,oldPos,newPos);
+    await taskProvider.rearang(task,isMoveDown,oldPos,newPos);
   }
 
   //TODO: fix delete task  function
@@ -49,12 +54,12 @@ class TasksModel with ChangeNotifier {
     storeIndex();
     notifyListeners();
 
-    await provider.delete(toDelete);
+    await taskProvider.delete(toDelete);
   }
 
   checkCurrentTask() {
     tasks[parentLoop.checkedTaskIndex].checkedTimes++;
-    provider.update(tasks[parentLoop.checkedTaskIndex]);
+    taskProvider.update(tasks[parentLoop.checkedTaskIndex]);
     parentLoop.checkedTaskIndex = (++parentLoop.checkedTaskIndex) % tasks.length;
     storeIndex();
     notifyListeners();
@@ -68,8 +73,7 @@ class TasksModel with ChangeNotifier {
   }
 
   void storeIndex() {
-    //TODO: implement this function
-  }
+    loopProvider.update(parentLoop);  }
 
   int getIndex() {
     return parentLoop.checkedTaskIndex;
