@@ -30,7 +30,7 @@ class _DisplayTasksPageState extends State<DisplayTasksPage> {
       create: (_) => TasksModel(widget.parentLoop)..readTasks(),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.parentLoop.name),
+          title: Text(widget.parentLoop.title),
           centerTitle: true,
         ),
         body: Center(

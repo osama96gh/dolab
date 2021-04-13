@@ -6,53 +6,36 @@ import 'package:sqflite/sqflite.dart';
 class TaskProvider {
   Database db;
 
-  _onCreateDatabase(Database db, int version) async {
-    await db.execute(
-      '''
-         create table ${TodoTableInfo.tableName} ( 
-          ${TodoTableInfo.columnId} integer primary key autoincrement, 
-          ${TodoTableInfo.columnParentLoopId} integer not null,
-          ${TodoTableInfo.columnPosition} integer not null,
-          ${TodoTableInfo.columnTitle} text not null,
-          ${TodoTableInfo.columnCheckedTimes} integer
-          )
-        ''',
-    );
-  }
-
-  _onUpgradeDatabase(Database db, int oldVersion, int newVersion) async {
-    _onCreateDatabase(db, newVersion);
-  }
 
   Future open({String name = databaseName, version = databaseVersion}) async {
     String path = join(await getDatabasesPath(), name);
     db = await openDatabase(
       path,
       version: version,
-      onCreate: _onCreateDatabase,
-      onUpgrade: _onUpgradeDatabase,
+      onCreate: onCreateDatabase,
+      onUpgrade: onUpgradeDatabase,
     );
   }
 
   Future<Task> insert(Task todo, int parentLoopId) async {
     Map m = todo.toMap();
-    m.putIfAbsent(TodoTableInfo.columnParentLoopId, () => parentLoopId);
+    m.putIfAbsent(TaskTableInfo.columnParentLoopId, () => parentLoopId);
 
-    todo.id = await db.insert(TodoTableInfo.tableName, m);
+    todo.id = await db.insert(TaskTableInfo.tableName, m);
     return todo;
   }
 
   Future<List<Task>> getTasksForSpecificLoop(int loopId) async {
-    List<Map> maps = await db.query(TodoTableInfo.tableName,
+    List<Map> maps = await db.query(TaskTableInfo.tableName,
         columns: [
-          TodoTableInfo.columnId,
-          TodoTableInfo.columnParentLoopId,
-          TodoTableInfo.columnPosition,
-          TodoTableInfo.columnTitle,
-          TodoTableInfo.columnCheckedTimes
+          TaskTableInfo.columnId,
+          TaskTableInfo.columnParentLoopId,
+          TaskTableInfo.columnPosition,
+          TaskTableInfo.columnTitle,
+          TaskTableInfo.columnCheckedTimes
         ],
-        orderBy: '''${TodoTableInfo.columnPosition} ASC''',
-        where: '''${TodoTableInfo.columnParentLoopId} = ?''',
+        orderBy: '''${TaskTableInfo.columnPosition} ASC''',
+        where: '''${TaskTableInfo.columnParentLoopId} = ?''',
         whereArgs: [
           loopId
         ]);
@@ -69,21 +52,21 @@ class TaskProvider {
     if (isDown) {
       return db.transaction((txn) async {
         await txn.rawUpdate(
-            '''UPDATE ${TodoTableInfo.tableName} SET ${TodoTableInfo.columnPosition} = ${TodoTableInfo.columnPosition} -1 WHERE ${TodoTableInfo.columnPosition} > ? and ${TodoTableInfo.columnPosition} <= ?''',
+            '''UPDATE ${TaskTableInfo.tableName} SET ${TaskTableInfo.columnPosition} = ${TaskTableInfo.columnPosition} -1 WHERE ${TaskTableInfo.columnPosition} > ? and ${TaskTableInfo.columnPosition} <= ?''',
             [oldP, newP]);
 
         await txn.rawUpdate(
-            '''UPDATE ${TodoTableInfo.tableName} SET ${TodoTableInfo.columnPosition} = ${newP}  WHERE ${TodoTableInfo.columnId} = ? ''',
+            '''UPDATE ${TaskTableInfo.tableName} SET ${TaskTableInfo.columnPosition} = ${newP}  WHERE ${TaskTableInfo.columnId} = ? ''',
             [t.id]);
       });
     } else {
       return db.transaction((txn) async {
         await txn.rawUpdate(
-            '''UPDATE ${TodoTableInfo.tableName} SET ${TodoTableInfo.columnPosition} = ${TodoTableInfo.columnPosition} +1 WHERE ${TodoTableInfo.columnPosition} < ? and ${TodoTableInfo.columnPosition} >= ?''',
+            '''UPDATE ${TaskTableInfo.tableName} SET ${TaskTableInfo.columnPosition} = ${TaskTableInfo.columnPosition} +1 WHERE ${TaskTableInfo.columnPosition} < ? and ${TaskTableInfo.columnPosition} >= ?''',
             [oldP, newP]);
 
         await txn.rawUpdate(
-            '''UPDATE ${TodoTableInfo.tableName} SET ${TodoTableInfo.columnPosition} = ${newP}  WHERE ${TodoTableInfo.columnId} = ? ''',
+            '''UPDATE ${TaskTableInfo.tableName} SET ${TaskTableInfo.columnPosition} = ${newP}  WHERE ${TaskTableInfo.columnId} = ? ''',
             [t.id]);
       });
     }
@@ -92,16 +75,16 @@ class TaskProvider {
   Future delete(Task k) async {
     return db.transaction((txn) async {
       await txn.rawUpdate(
-          '''UPDATE ${TodoTableInfo.tableName} SET ${TodoTableInfo.columnPosition} = ${TodoTableInfo.columnPosition} -1 WHERE ${TodoTableInfo.columnPosition} > ?''',
+          '''UPDATE ${TaskTableInfo.tableName} SET ${TaskTableInfo.columnPosition} = ${TaskTableInfo.columnPosition} -1 WHERE ${TaskTableInfo.columnPosition} > ?''',
           [k.position]);
-      await txn.delete(TodoTableInfo.tableName,
-          where: '''${TodoTableInfo.columnId} = ?''', whereArgs: [k.id]);
+      await txn.delete(TaskTableInfo.tableName,
+          where: '''${TaskTableInfo.columnId} = ?''', whereArgs: [k.id]);
     });
   }
 
   Future<int> update(Task todo) async {
-    return await db.update(TodoTableInfo.tableName, todo.toMap(),
-        where: '${TodoTableInfo.columnId} = ?', whereArgs: [todo.id]);
+    return await db.update(TaskTableInfo.tableName, todo.toMap(),
+        where: '${TaskTableInfo.columnId} = ?', whereArgs: [todo.id]);
   }
 
   Future close() async => db.close();
