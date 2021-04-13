@@ -1,5 +1,7 @@
 class Loop {
   String name;
+  int id = 0;
+  int index = 0;
 
   Loop(this.name);
 

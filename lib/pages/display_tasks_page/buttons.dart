@@ -52,7 +52,7 @@ class ButtonsWidget extends StatelessWidget {
             OutlineButton.icon(
               onPressed: () async {
                 Task loop = await Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => AddTaskPage()));
+                    MaterialPageRoute(builder: (context) => AddTaskPage(model.tasks.length)));
                 if (loop != null) model.addTask(loop);
               },
               icon: Icon(Icons.add),

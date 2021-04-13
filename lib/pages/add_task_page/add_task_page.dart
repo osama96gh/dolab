@@ -1,9 +1,12 @@
-import 'package:dolab/models/loop.dart';
 import 'package:dolab/models/task.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AddTaskPage extends StatefulWidget {
+  int position;
+
+  AddTaskPage(this.position);
+
   @override
   _AddTaskPageState createState() => _AddTaskPageState();
 }
@@ -13,7 +16,6 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Add New Task'),
@@ -36,8 +38,13 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 onPressed: enteredText.isEmpty
                     ? null
                     : () {
-                  Navigator.pop(context, Task(enteredText));
-                },
+                        Navigator.pop(
+                            context,
+                            Task(
+                              enteredText,
+                              widget.position,
+                            ));
+                      },
                 child: Text('Done'),
               ),
             ],

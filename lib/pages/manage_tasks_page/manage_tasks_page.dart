@@ -38,7 +38,7 @@ class _EditTasksState extends State<ManageTasksPage> {
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: Text("Delete Task:"),
-      content: Text(model.tasks[taskIndex].name),
+      content: Text(model.tasks[taskIndex].title),
       actions: [
         deleteButton,
         cancelButton,
@@ -75,7 +75,7 @@ class _EditTasksState extends State<ManageTasksPage> {
                       },
                     ),
                     leading: Icon(Icons.drag_indicator),
-                    title: Text(widget.model.tasks[i].name),
+                    title: Text(widget.model.tasks[i].title +" "+ widget.model.tasks[i].position.toString()),
                     onTap: () {},
                   ),
                 ),
