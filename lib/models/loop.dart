@@ -1,15 +1,26 @@
 class Loop {
-  String name;
-  int id = 0;
-  int index = 0;
 
-  Loop(this.name);
+  String title;
+  int index = 0;
+  int id;
+
+  Loop(this.title);
 
   Loop.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
+    title = json['title'];
   }
 
   toJson() {
-    return {'name': name};
+    return {'title': title};
+  }
+
+  Loop.fromMap(Map<String, dynamic> json) {
+    title = json['title'];
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+    };
   }
 }
