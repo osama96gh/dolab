@@ -27,22 +27,12 @@ class LoopsModel with ChangeNotifier {
 
   }
 
-  _loopsFromJson(String jsonList) {
-    loops.clear();
-    List<dynamic> list = json.decode(jsonList);
-    list.forEach((element) {
-      loops.add(Loop.fromJson(element));
-    });
-  }
 
   storeLoops() async {
     // SharedPreferences preferences = await SharedPreferences.getInstance();
     // preferences.setString(loopsKey, _loopsToJson());
   }
 
-  _loopsToJson() {
-    return jsonEncode(loops.map((e) => e.toJson()).toList());
-  }
 
   addLoop(Loop loop) async {
     loops.add(await provider.insert(loop));

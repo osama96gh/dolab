@@ -4,9 +4,6 @@ import 'package:sqflite/sqflite.dart';
 import '../models/loop.dart';
 import 'database_info.dart';
 
-final String tableLoop = 'loop';
-final String columnId = '_id';
-final String columnTitle = 'title';
 
 class LoopProvider {
   Database db;
@@ -17,27 +14,20 @@ class LoopProvider {
     db = await openDatabase(
       dbPath,
       version: version,
-      onCreate: (Database db, int version) async {
-        await db.execute(
-          '''
-          create table $tableLoop ( 
-            $columnId integer primary key autoincrement, 
-            $columnTitle text not null)
-          ''',
-        );
-      },
+      onCreate: onCreateDatabase,
+      onUpgrade: onUpgradeDatabase,
     );
   }
 
   Future<Loop> insert(Loop loop) async {
-    loop.id = await db.insert(tableLoop, loop.toMap());
+    loop.id = await db.insert( LoopTableInfo.tableName, loop.toMap());
     return loop;
   }
 
   Future<Loop> getLoop(int id) async {
-    List<Map> maps = await db.query(tableLoop,
-        columns: [columnId, columnTitle],
-        where: '$columnId = ?',
+    List<Map> maps = await db.query(LoopTableInfo.tableName,
+        columns: [LoopTableInfo.columnId, LoopTableInfo.columnTitle, LoopTableInfo.columnTaskIndex],
+        where: '''${LoopTableInfo.columnId} = ?''',
         whereArgs: [id]);
     if (maps.length > 0) {
       return Loop.fromMap(maps.first);
@@ -46,7 +36,7 @@ class LoopProvider {
   }
 
   Future<List<Loop>> getAllLoops() async {
-    List<Map<String, Object>> maps = await db.query(tableLoop);
+    List<Map<String, Object>> maps = await db.query(LoopTableInfo.tableName);
     List<Loop> loops = [];
     maps.forEach((element) {
       loops.add(Loop.fromMap(element));
@@ -55,12 +45,12 @@ class LoopProvider {
   }
 
   Future<int> delete(int id) async {
-    return await db.delete(tableLoop, where: '$columnId = ?', whereArgs: [id]);
+    return await db.delete(LoopTableInfo.tableName, where: '''${LoopTableInfo.columnId} = ?''', whereArgs: [id]);
   }
 
   Future<int> update(Loop todo) async {
-    return await db.update(tableLoop, todo.toMap(),
-        where: '$columnId = ?', whereArgs: [todo.id]);
+    return await db.update(LoopTableInfo.tableName, todo.toMap(),
+        where: '''${LoopTableInfo.columnId} = ?''', whereArgs: [todo.id]);
   }
 
   Future close() async => db.close();

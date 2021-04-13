@@ -44,8 +44,8 @@ class TasksModel with ChangeNotifier {
   deleteTask(int pos) async {
     Task toDelete = tasks.removeAt(pos);
     tasks.length == 0
-        ? parentLoop.index = 0
-        : parentLoop.index = parentLoop.index % tasks.length;
+        ? parentLoop.checkedTaskIndex = 0
+        : parentLoop.checkedTaskIndex = parentLoop.checkedTaskIndex % tasks.length;
     storeIndex();
     notifyListeners();
 
@@ -53,16 +53,16 @@ class TasksModel with ChangeNotifier {
   }
 
   checkCurrentTask() {
-    tasks[parentLoop.index].checkedTimes++;
-    provider.update(tasks[parentLoop.index]);
-    parentLoop.index = (++parentLoop.index) % tasks.length;
+    tasks[parentLoop.checkedTaskIndex].checkedTimes++;
+    provider.update(tasks[parentLoop.checkedTaskIndex]);
+    parentLoop.checkedTaskIndex = (++parentLoop.checkedTaskIndex) % tasks.length;
     storeIndex();
     notifyListeners();
   }
 
   skipCurrentTask() {
-    parentLoop.index =
-        tasks.length == 0 ? 0 : (++parentLoop.index) % tasks.length;
+    parentLoop.checkedTaskIndex =
+        tasks.length == 0 ? 0 : (++parentLoop.checkedTaskIndex) % tasks.length;
     storeIndex();
     notifyListeners();
   }
@@ -72,6 +72,6 @@ class TasksModel with ChangeNotifier {
   }
 
   int getIndex() {
-    return parentLoop.index;
+    return parentLoop.checkedTaskIndex;
   }
 }
