@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         "/": (_) => loopsPage(),
-        "/tasks": (_) => DisplayTasksPage(title: 'DoLab'),
+        // "/tasks": (_) => DisplayTasksPage(parentLoop: 'DoLab'),
       },
     );
   }

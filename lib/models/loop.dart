@@ -1,6 +1,7 @@
 class Loop {
-  String title;
 
+  String title;
+  int index = 0;
   int id;
 
   Loop(this.title);
