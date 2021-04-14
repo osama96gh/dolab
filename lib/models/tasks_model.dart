@@ -11,18 +11,13 @@ class TasksModel with ChangeNotifier {
 
   List<Task> tasks = List<Task>.empty(growable: true);
 
-  TaskProvider taskProvider;
-  LoopProvider loopProvider;
-
-  //TODO: use loop provider to store the changes could happen to the index in the parent loop object
+  TaskProvider taskProvider = TaskProvider();
+  LoopProvider loopProvider = LoopProvider();
 
   readTasks() async {
-    taskProvider = new TaskProvider();
     await taskProvider.open();
-
-    loopProvider = new LoopProvider();
     await loopProvider.open();
-
+    tasks.clear();
     tasks.addAll(await taskProvider.getTasksForSpecificLoop(parentLoop.id));
     notifyListeners();
   }
@@ -33,47 +28,47 @@ class TasksModel with ChangeNotifier {
     notifyListeners();
   }
 
-  //TODO: fix the reorder function the mach the new changes
-  reorderTasks(oldPos, newPos)async {
+  reorderTasks(oldPos, newPos) async {
     var isMoveDown = newPos > oldPos;
     if (isMoveDown) newPos--;
-    print('old ' + oldPos.toString() + " new: " + newPos.toString());
-
     var task = tasks.removeAt(oldPos);
     tasks.insert(newPos, task);
     notifyListeners();
-    await taskProvider.rearang(task,isMoveDown,oldPos,newPos);
+    await taskProvider.rearang(task, isMoveDown, oldPos, newPos);
+    readTasks();
   }
 
-  //TODO: fix delete task  function
   deleteTask(int pos) async {
-    Task toDelete = tasks.removeAt(pos);
+    // Task toDelete = tasks.removeAt(pos);
     tasks.length == 0
         ? parentLoop.checkedTaskIndex = 0
-        : parentLoop.checkedTaskIndex = parentLoop.checkedTaskIndex % tasks.length;
-    storeIndex();
-    notifyListeners();
+        : parentLoop.checkedTaskIndex =
+            parentLoop.checkedTaskIndex % tasks.length;
 
-    await taskProvider.delete(toDelete);
+    await taskProvider.delete(tasks[pos]);
+    storeIndex();
+    readTasks();
   }
 
   checkCurrentTask() {
     tasks[parentLoop.checkedTaskIndex].checkedTimes++;
     taskProvider.update(tasks[parentLoop.checkedTaskIndex]);
-    parentLoop.checkedTaskIndex = (++parentLoop.checkedTaskIndex) % tasks.length;
-    storeIndex();
+    parentLoop.checkedTaskIndex =
+        (++parentLoop.checkedTaskIndex) % tasks.length;
     notifyListeners();
+    storeIndex();
   }
 
   skipCurrentTask() {
     parentLoop.checkedTaskIndex =
         tasks.length == 0 ? 0 : (++parentLoop.checkedTaskIndex) % tasks.length;
-    storeIndex();
     notifyListeners();
+    storeIndex();
   }
 
-  void storeIndex() {
-    loopProvider.update(parentLoop);  }
+  storeIndex() async {
+    await loopProvider.update(parentLoop);
+  }
 
   int getIndex() {
     return parentLoop.checkedTaskIndex;

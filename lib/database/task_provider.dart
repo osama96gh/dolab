@@ -42,8 +42,7 @@ class TaskProvider {
 
     List<Task> tasks = [];
     maps.forEach((element) {
-      print(element);
-      tasks.add(Task.fromMap(element));
+       tasks.add(Task.fromMap(element));
     });
     return tasks;
   }

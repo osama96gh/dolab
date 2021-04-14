@@ -12,63 +12,65 @@ class ButtonsWidget extends StatelessWidget {
 
     return Container(
         constraints: BoxConstraints(maxWidth: 100),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: OutlineButton(
-                    onLongPress: () {
-                      model.checkCurrentTask();
-                    },
-                    onPressed: () {
-                      final snackBar = SnackBar(content: Text('Long Click!'));
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: OutlineButton(
+                      onLongPress: () {
+                        model.checkCurrentTask();
+                      },
+                      onPressed: () {
+                        final snackBar = SnackBar(content: Text('Long Click!'));
 
-                      Scaffold.of(context).showSnackBar(snackBar);
-                    },
-                    child: Icon(Icons.check),
+                        Scaffold.of(context).showSnackBar(snackBar);
+                      },
+                      child: Icon(Icons.check),
+                    ),
                   ),
-                ),
-                SizedBox.fromSize(
-                  size: Size(10, 10),
-                ),
-                Expanded(
-                  child: OutlineButton(
-                    onLongPress: () {
-                      model.skipCurrentTask();
-                    },
-                    onPressed: () {
-                      final snackBar = SnackBar(content: Text('Long Click!'));
+                  SizedBox.fromSize(
+                    size: Size(10, 10),
+                  ),
+                  Expanded(
+                    child: OutlineButton(
+                      onLongPress: () {
+                        model.skipCurrentTask();
+                      },
+                      onPressed: () {
+                        final snackBar = SnackBar(content: Text('Long Click!'));
 
-                      Scaffold.of(context).showSnackBar(snackBar);
-                    },
-                    child: Icon(Icons.navigate_next),
+                        Scaffold.of(context).showSnackBar(snackBar);
+                      },
+                      child: Icon(Icons.navigate_next),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            OutlineButton.icon(
-              onPressed: () async {
-                Task loop = await Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => AddTaskPage(model.tasks.length)));
-                if (loop != null) model.addTask(loop);
-              },
-              icon: Icon(Icons.add),
-              label: Text("Add New Task"),
-            ),
-            OutlineButton.icon(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ManageTasksPage(model)));
-              },
-              icon: Icon(Icons.list),
-              label: Text("Manage Tasks"),
-            ),
-          ],
+                ],
+              ),
+              OutlineButton.icon(
+                onPressed: () async {
+                  Task loop = await Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => AddTaskPage(model.tasks.length)));
+                  if (loop != null) model.addTask(loop);
+                },
+                icon: Icon(Icons.add),
+                label: Text("Add New Task"),
+              ),
+              OutlineButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ManageTasksPage(model)));
+                },
+                icon: Icon(Icons.list),
+                label: Text("Manage Tasks"),
+              ),
+            ],
+          ),
         ));
   }
 }

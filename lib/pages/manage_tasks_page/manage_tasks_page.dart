@@ -1,6 +1,6 @@
 import 'package:dolab/models/tasks_model.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 
 class ManageTasksPage extends StatefulWidget {
   // final List<Task> tasks;
@@ -29,10 +29,8 @@ class _EditTasksState extends State<ManageTasksPage> {
     Widget deleteButton = FlatButton(
       child: Text("Delete"),
       onPressed: () {
-        setState(() {
-          model.deleteTask(taskIndex);
-          Navigator.of(context).pop();
-        });
+        model.deleteTask(taskIndex);
+        Navigator.of(context).pop();
       },
     );
     // set up the AlertDialog
@@ -55,37 +53,47 @@ class _EditTasksState extends State<ManageTasksPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("All TASKS"),
-      ),
-      body: Container(
-        child: ReorderableListView(
-          children: [
-            for (int i = 0; i < widget.model.tasks.length; i++)
-              Container(
-                key: ValueKey(widget.model.tasks[i]),
-                margin: EdgeInsets.all(2),
-                child: Card(
-                  child: ListTile(
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        showDeleteDialog(context, widget.model, taskIndex: i);
-                      },
-                    ),
-                    leading: Icon(Icons.drag_indicator),
-                    title: Text(widget.model.tasks[i].title +" "+ widget.model.tasks[i].position.toString()),
-                    onTap: () {},
-                  ),
-                ),
-              )
-          ],
-          onReorder: (oldP, newP) {
-            // dev.log("old:"+oldP.toString()+ " new:"+newP.toString());
-            setState(() {
-              widget.model.reorderTasks(oldP, newP);
-            });
+    return ChangeNotifierProvider<TasksModel>.value(
+      value: widget.model,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Manage Tasks"),
+        ),
+        body: Builder(
+          builder: (context) {
+            TasksModel model = Provider.of(context);
+            return Container(
+              child: ReorderableListView(
+                children: [
+                  for (int i = 0; i < model.tasks.length; i++)
+                    Container(
+                      key: ValueKey(model.tasks[i]),
+                      margin: EdgeInsets.all(2),
+                      child: Card(
+                        child: ListTile(
+                          trailing: IconButton(
+                            icon: Icon(
+                              Icons.delete_rounded,
+                              color: Colors.red.shade700,
+                            ),
+                            onPressed: () {
+                              showDeleteDialog(context, model, taskIndex: i);
+                            },
+                          ),
+                          leading: Icon(
+                            Icons.drag_indicator,
+                          ),
+                          title: Center(child: Text(model.tasks[i].title)),
+                          onTap: () {},
+                        ),
+                      ),
+                    )
+                ],
+                onReorder: (oldP, newP) {
+                  model.reorderTasks(oldP, newP);
+                },
+              ),
+            );
           },
         ),
       ),
