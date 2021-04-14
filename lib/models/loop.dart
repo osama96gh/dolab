@@ -1,13 +1,23 @@
+import 'package:dolab/database/database_info.dart';
+
 class Loop {
-  String name;
+  String title;
+  int checkedTaskIndex = 0;
+  int id;
 
-  Loop(this.name);
+  Loop(this.title, {this.checkedTaskIndex=0});
 
-  Loop.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
+  Loop.fromMap(Map<String, dynamic> json) {
+    title = json[LoopTableInfo.columnTitle];
+    checkedTaskIndex = json[LoopTableInfo.columnTaskIndex];
+    id = json[LoopTableInfo.columnId];
   }
 
-  toJson() {
-    return {'name': name};
+  Map<String, dynamic> toMap() {
+    return {
+      LoopTableInfo.columnTitle: title,
+      LoopTableInfo.columnTaskIndex: checkedTaskIndex,
+      LoopTableInfo.columnId: id
+    };
   }
 }

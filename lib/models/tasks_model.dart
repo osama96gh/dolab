@@ -1,84 +1,76 @@
-import 'dart:convert';
-
+import 'package:dolab/database/Loop_provider.dart';
+import 'package:dolab/database/task_provider.dart';
+import 'package:dolab/models/loop.dart';
 import 'package:dolab/models/task.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class TasksModel with ChangeNotifier {
-  var tasksKey = "tasks_key";
-  final indexKey = "index_key";
+  Loop parentLoop;
 
-  TasksModel(this.tasksKey);
+  TasksModel(this.parentLoop);
 
-  var index = 0;
   List<Task> tasks = List<Task>.empty(growable: true);
 
-  readTasksAndIndex() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  TaskProvider taskProvider = TaskProvider();
+  LoopProvider loopProvider = LoopProvider();
 
-    var jsonData = prefs.getString(tasksKey) ?? "[]";
-    _tasksFromJson(jsonData);
-    index = prefs.getInt(indexKey) ?? 0;
-    notifyListeners();
-  }
-
-  _tasksFromJson(String jsonData) {
+  readTasks() async {
+    await taskProvider.open();
+    await loopProvider.open();
     tasks.clear();
-    List<dynamic> list = json.decode(jsonData);
-    for (dynamic d in list) {
-      tasks.add(Task.fromJson(d));
-    }
+    tasks.addAll(await taskProvider.getTasksForSpecificLoop(parentLoop.id));
+    notifyListeners();
   }
 
-  _tasksToJson() {
-    return jsonEncode(tasks.map((e) => e.toJson()).toList());
-  }
-
-  addTask(Task t) {
+  addTask(Task t) async {
+    t = await taskProvider.insert(t, parentLoop.id);
     tasks.add(t);
-    storeTasks();
     notifyListeners();
   }
 
-  storeIndex() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt(indexKey, index);
-  }
-
-  storeTasks() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(tasksKey, _tasksToJson());
-  }
-
-  reorderTasks(oldPos, newPos) {
+  reorderTasks(oldPos, newPos) async {
+    var isMoveDown = newPos > oldPos;
+    if (isMoveDown) newPos--;
     var task = tasks.removeAt(oldPos);
-    if (newPos >= tasks.length)
-      tasks.add(task);
-    else
-      tasks.insert(newPos, task);
+    tasks.insert(newPos, task);
     notifyListeners();
-    storeTasks();
+    await taskProvider.rearang(task, isMoveDown, oldPos, newPos);
+    readTasks();
   }
 
-  deleteTask(int pos) {
-    tasks.removeAt(pos);
-    tasks.length == 0 ? index = 0 : index = index % tasks.length;
+  deleteTask(int pos) async {
+    // Task toDelete = tasks.removeAt(pos);
+    tasks.length == 0
+        ? parentLoop.checkedTaskIndex = 0
+        : parentLoop.checkedTaskIndex =
+            parentLoop.checkedTaskIndex % tasks.length;
 
+    await taskProvider.delete(tasks[pos]);
     storeIndex();
-    storeTasks();
+    readTasks();
   }
 
   checkCurrentTask() {
-    tasks[index].checkedTime++;
-    index = (++index) % tasks.length;
+    tasks[parentLoop.checkedTaskIndex].checkedTimes++;
+    taskProvider.update(tasks[parentLoop.checkedTaskIndex]);
+    parentLoop.checkedTaskIndex =
+        (++parentLoop.checkedTaskIndex) % tasks.length;
     notifyListeners();
     storeIndex();
-    storeTasks();
   }
 
   skipCurrentTask() {
-    index = (++index) % tasks.length;
+    parentLoop.checkedTaskIndex =
+        tasks.length == 0 ? 0 : (++parentLoop.checkedTaskIndex) % tasks.length;
     notifyListeners();
     storeIndex();
+  }
+
+  storeIndex() async {
+    await loopProvider.update(parentLoop);
+  }
+
+  int getIndex() {
+    return parentLoop.checkedTaskIndex;
   }
 }

@@ -1,15 +1,27 @@
+import 'package:dolab/database/database_info.dart';
+
 class Task {
-  String name;
-  var checkedTime = 0;
+  String title;
+  int checkedTimes = 0;
+  int id;
+  int position;
 
-  Task(this.name, [this.checkedTime = 0]);
+  Task(this.title, this.position, [this.id, this.checkedTimes = 0]);
 
-  Task.fromJson(Map<String, dynamic> json)
-      : name = json['name'],
-        checkedTime = json['checkedTime'];
+  Task.fromMap(Map<String, dynamic> json) {
+    title = json[TaskTableInfo.columnTitle];
+    checkedTimes = json[TaskTableInfo.columnCheckedTimes];
+    position = json[TaskTableInfo.columnPosition];
+    int id = json[TaskTableInfo.columnId];
+    if (id != null) {
+      this.id = id;
+    }
+  }
 
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'checkedTime': checkedTime,
+  Map<String, dynamic> toMap() => {
+        TaskTableInfo.columnTitle: title,
+        TaskTableInfo.columnCheckedTimes: checkedTimes,
+        TaskTableInfo.columnId: id,
+        TaskTableInfo.columnPosition: position
       };
 }
