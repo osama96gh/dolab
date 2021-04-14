@@ -1,5 +1,3 @@
-
-
 import 'package:dolab/models/tasks_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -26,8 +24,10 @@ class _TasksListWidgetState extends State<TasksListWidget> {
   Widget build(BuildContext context) {
     TasksModel model = Provider.of<TasksModel>(context);
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      _controller.animateTo(model.getIndex() * MediaQuery.of(context).size.width,
-          duration: Duration(milliseconds: 500), curve: Curves.linear);
+      _controller.animateTo(
+          model.getIndex() * MediaQuery.of(context).size.width,
+          duration: Duration(milliseconds: 500),
+          curve: Curves.linear);
     });
     return ListView.builder(
       scrollDirection: Axis.horizontal,
