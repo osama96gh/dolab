@@ -89,7 +89,7 @@ class _LoopsPageState extends State<LoopsPage> {
                             vertical: 8, horizontal: 8),
                         child: Container(
                           decoration: BoxDecoration(
-                              color: isExpanded[loopIdx] ? Colors.white : Colors.white,
+                              color: Colors.white,
                               border: Border.all(
                                   color: isExpanded[loopIdx]
                                       ? Colors.blue.shade500
@@ -185,14 +185,16 @@ class _LoopsPageState extends State<LoopsPage> {
                                     MainAxisAlignment.spaceAround,
                                 children: [
                                   IconButton(
-                                    color: Colors.amber,
+                                    tooltip: 'delete',
+                                    color: Colors.red.shade700,
                                       icon: Icon(Icons.delete_rounded),
                                       onPressed: () {
                                         showDeleteDialog(conx, model,
                                             loopIndex: loopIdx);
                                       }),
                                   IconButton(
-                                      color: Colors.amber,
+                                    tooltip: "open tasks",
+                                      color: Colors.blue.shade700,
                                       icon: Icon(Icons.open_in_new_rounded),
                                       onPressed: () async {
                                         await Navigator.push(
