@@ -16,7 +16,7 @@ class ButtonsWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
+              model.tasks.isEmpty?Container(): Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
@@ -59,7 +59,7 @@ class ButtonsWidget extends StatelessWidget {
                 icon: Icon(Icons.add),
                 label: Text("Add New Task"),
               ),
-              OutlineButton.icon(
+              model.tasks.isEmpty?Container(): OutlineButton.icon(
                 onPressed: () {
                   Navigator.push(
                       context,

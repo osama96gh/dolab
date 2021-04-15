@@ -6,7 +6,6 @@ import 'package:sqflite/sqflite.dart';
 class TaskProvider {
   Database db;
 
-
   Future open({String name = databaseName, version = databaseVersion}) async {
     String path = join(await getDatabasesPath(), name);
     db = await openDatabase(
@@ -42,9 +41,39 @@ class TaskProvider {
 
     List<Task> tasks = [];
     maps.forEach((element) {
-       tasks.add(Task.fromMap(element));
+      tasks.add(Task.fromMap(element));
     });
     return tasks;
+  }
+
+  Future<Task> getTaskSpecificLoop(int loopId, int position) async {
+    List<Map> maps = await db.query(
+      TaskTableInfo.tableName,
+      columns: [
+        TaskTableInfo.columnId,
+        TaskTableInfo.columnParentLoopId,
+        TaskTableInfo.columnCheckedTimes,
+        TaskTableInfo.columnPosition,
+        TaskTableInfo.columnTitle,
+      ],
+      where:
+      '''${TaskTableInfo.columnParentLoopId} = ? and ${TaskTableInfo.columnPosition} = ? ''',
+      whereArgs: [loopId, position],
+      limit: 1,
+    );
+
+    if (maps.length == 0) return null;
+    return Task.fromMap(maps.first);
+  }
+
+
+  Future deleteAllTasksOfSpecificLoop(int loopId) async {
+    return await db.delete(
+      TaskTableInfo.tableName,
+      where:
+      '''${TaskTableInfo.columnParentLoopId} = ? ''',
+      whereArgs: [loopId],
+    );
   }
 
   Future rearang(Task t, bool isDown, oldP, newP) {
