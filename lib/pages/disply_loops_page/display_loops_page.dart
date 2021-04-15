@@ -2,6 +2,7 @@ import 'package:dolab/models/loop.dart';
 import 'package:dolab/models/loops_model.dart';
 import 'package:dolab/pages/add_loop_page/add_loop_page.dart';
 import 'package:dolab/pages/display_tasks_page/display_tasks_page.dart';
+import 'package:dolab/pages/disply_loops_page/empty_loop_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -67,7 +68,9 @@ class _LoopsPageState extends State<LoopsPage> {
                 },
               ),
             ),
-            body: ListView.builder(
+            body:model.loops.isEmpty? EmptyLoopPage(): ListView.builder(
+              padding: EdgeInsets.only(bottom: 100),
+
               itemBuilder: (conx, loopIdx) {
                 return Padding(
                   padding:
@@ -117,22 +120,33 @@ class _LoopsPageState extends State<LoopsPage> {
                               : ListView.builder(
                                   itemCount: model.loopsTasks[loopIdx].length,
                                   itemBuilder: (context, taskIdx) {
+                                    bool isSelected = taskIdx ==
+                                        model.loops[loopIdx].checkedTaskIndex;
                                     return Container(
                                       alignment: Alignment.center,
                                       decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: Colors.blue,
+                                              width: isSelected ? 1 : 1),
                                           borderRadius:
                                               BorderRadius.circular(4),
-                                          color: taskIdx ==
-                                                  model.loops[loopIdx]
-                                                      .checkedTaskIndex
-                                              ? Colors.amber
-                                              : Colors.blue),
+                                          color: isSelected
+                                              ? Colors.blue
+                                              : Colors.white),
                                       margin: EdgeInsets.all(4),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
-                                        child: Text(model
-                                            .loopsTasks[loopIdx][taskIdx]
-                                            .title),
+                                        child: Text(
+                                          model.loopsTasks[loopIdx][taskIdx]
+                                              .title,
+                                          style: TextStyle(
+                                              color: isSelected
+                                                  ? Colors.white
+                                                  : Colors.blue,
+                                              fontWeight: isSelected
+                                                  ? FontWeight.bold
+                                                  : FontWeight.normal),
+                                        ),
                                       ),
                                     );
                                   },
@@ -147,7 +161,6 @@ class _LoopsPageState extends State<LoopsPage> {
                                 onPressed: () {
                                   showDeleteDialog(conx, model,
                                       loopIndex: loopIdx);
-
                                 }),
                             IconButton(
                                 icon: Icon(Icons.open_in_new_rounded),

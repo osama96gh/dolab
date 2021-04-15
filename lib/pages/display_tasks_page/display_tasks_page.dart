@@ -28,50 +28,55 @@ class _DisplayTasksPageState extends State<DisplayTasksPage> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => TasksModel(widget.parentLoop)..readTasks(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.parentLoop.title),
-          centerTitle: true,
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Expanded(
-                flex: 2,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.width),
-                    child: TasksListWidget(),
-                  ),
-                ),
-              ),
-              IconButton(
-                  icon: Icon(Icons.keyboard_arrow_up),
-                  onPressed: () {
-                    setState(() {});
-                  }),
-              Expanded(
-                flex: 1,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        right: 50, left: 50, top: 20, bottom: 20),
-                    child: Consumer<TasksModel>(
-                      builder: (context, model, _) => ButtonsWidget(),
+      child: Builder(
+        builder: (context) {
+          TasksModel model = Provider.of(context);
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(widget.parentLoop.title),
+              centerTitle: true,
+            ),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Expanded(
+                    flex: 2,
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.width),
+                        child: TasksListWidget(),
+                      ),
                     ),
                   ),
-                ),
+                  model.tasks.isEmpty?Container():IconButton(
+                      icon: Icon(Icons.keyboard_arrow_up),
+                      onPressed: () {
+                        setState(() {});
+                      }),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                            right: 50, left: 50, top: 20, bottom: 20),
+                        child: Consumer<TasksModel>(
+                          builder: (context, model, _) => ButtonsWidget(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
