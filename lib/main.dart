@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       routes: {
-        "/": (_) => loopsPage(),
+        "/": (_) => LoopsPage(),
         // "/tasks": (_) => DisplayTasksPage(parentLoop: 'DoLab'),
       },
     );
