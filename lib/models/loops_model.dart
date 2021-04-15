@@ -52,6 +52,7 @@ class LoopsModel with ChangeNotifier {
   }
 
   deleteLoop(Loop loop) async {
+    await taskProvider.deleteAllTasksOfSpecificLoop(loop.id);
     await loopProvider.delete(loop.id);
     int idx = loops.indexOf(loop);
     print(idx.toString());
